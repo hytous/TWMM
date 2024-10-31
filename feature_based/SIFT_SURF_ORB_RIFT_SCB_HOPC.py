@@ -7,9 +7,13 @@ import cv2
 import kornia as K
 import kornia.feature as KF
 import torch
+import kornia_moons
 from kornia_moons.feature import *
 
-
+'''
+是一个用于计算机视觉的开源库，它基于 PyTorch 构建，提供了一组强大的图像处理和增强工具。
+这些工具可以直接集成到 PyTorch 神经网络的训练过程中，支持图像转换、特征提取、几何变换等操作，适合在深度学习中应用计算机视觉任务。
+'''
 
 
 eng = matlab.engine.start_matlab()

@@ -65,7 +65,7 @@ def one_img_process(thermal_tiff_path,visible_rgb_path,thermal_rgb_path,method,s
     elif method in ['cfog','tamm']:
         homo, correspoint = dict_method[method](thermal_visible_c,cfg)
 
-    if homo is None:
+    if   homo is None:
         homo=np.array([[1, 0, 0],
                       [0, 1, 0],
                       [0, 0, 1]], dtype=np.float64)
@@ -108,6 +108,8 @@ if __name__=='__main__':
     img_name_list = ['12-09-57-454']#'21-11-28-547'#'21-11-32-580',21-11-28-547,21-10-58-550,21-11-14-582,21-11-16-552,21-11-18-549,21-11-20-556,
     for img_name in img_name_list:
         thermal_path = f'test_img/{img_name}-radiometric.tiff'
+        # thermal_path 通常表示一个指向 热图像文件（thermal image file）的路径。
+        # TIFF（Tagged Image File Format）是一种灵活、适应性强的图像文件格式，广泛用于存储高质量的图像数据
         thermal_rgb_path = f'test_img/{img_name}-radiometric.jpg'
         visible_path = f'test_img/{img_name}-visible.jpg'
 

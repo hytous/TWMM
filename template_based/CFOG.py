@@ -102,15 +102,19 @@ class CFOG_descriptor():
 
         return orientation_centers
 
-    def feature_show(self,feature):
+    def feature_show(self, feature):
         feature_image=[]
-        for index in range(feature.shape[2]):
-            sub_fea=feature[:,:,index]
+        for index in range(feature.shape[2]):  # 长*宽*方向导  shape[2]是方向导的个个数，共9个方向
+            sub_fea=feature[:, :, index]
+            # 将 sub_fea 的值标准化到 0 到 255 的范围，并将其转换为 8 位无符号整数类型。
             sub_fea=cv2.normalize(sub_fea,dst=None,alpha=0,beta=255,norm_type=cv2.NORM_MINMAX).astype(np.uint8)
             feature_image.append(sub_fea)
         return feature_image
 
     def extract(self):
+        """
+        论文4.1.1
+        """
         height, width = self.img.shape #输入影像的大小为[400,400]
         #1.计算每个像素的梯度和方向
         gradient_values_x, gradient_values_y = self.global_gradient() #利用sobel算子计算梯度，然后得到梯度的大小和梯度的方向；其中mag和angle的shape均为[400,400]
@@ -126,7 +130,10 @@ class CFOG_descriptor():
             cell_gradient_vector_3D[:,:,index]=0.25*cell_gradient_vector_2D[:,:,index-1]+0.25*cell_gradient_vector_2D[:,:,(index+1)%9]+0.5*cell_gradient_vector_2D[:,:,index]
         #归一化向量
         fea_img = self.feature_show(cell_gradient_vector_3D.copy())
+        # 计算 cell_gradient_vector_3D 在 axis=2 维度上的向量范数。axis=2 意味着将沿第三个轴（方向导）计算每个向量的模。
+        # 增加一个极小值 1e−20 来防止出现零值。
         fea_mag=np.linalg.norm(cell_gradient_vector_3D,axis=2)+1e-20
+        # 对每个向量进行归一化，使得每个向量的模为 1。
         cell_gradient_vector_3D=cell_gradient_vector_3D/(fea_mag[:,:,np.newaxis])
         fea_img_norm = self.feature_show(cell_gradient_vector_3D.copy())
         return cell_gradient_vector_3D,fea_mag,fea_img,fea_img_norm

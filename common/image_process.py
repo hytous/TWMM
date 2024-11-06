@@ -6,6 +6,7 @@ import numpy as np
 import scipy.io as sio
 from .tools import csv_to_list,exist_or_mkdir
 
+
 def fusion_image(thermal_img,rgb_img):
     #来自H:\mlx_thermal_Images\code\CFOG_testSCBTemplate2\test_fusion
     W,H,C=thermal_img.shape
@@ -21,6 +22,7 @@ def fusion_image(thermal_img,rgb_img):
     fusion=alpha*thermal_img+(1-alpha)*rgb_img
     fusion=fusion.astype(np.uint8)
     return fusion
+
 
 def stitch_img(imgList,hor_flag=1,outpath=None,spacing=10):
     """
@@ -47,27 +49,33 @@ def stitch_img(imgList,hor_flag=1,outpath=None,spacing=10):
         cv2.imwrite(outpath,stitch)
     return stitch
 
-def img_read(img_path,scale):
+
+def img_read(img_path, scale):
     """
+    读取图片并按照scale进行放缩
     img_path:path of img
     scale：
     grey flag：
     """
     #if end with '.tiff' or '.tif'
-    if os.path.split(img_path)[1].split('.')[-1] in ['mat']:
-        img=sio.loadmat(img_path)['img1_scb']
-        if scale!=1:
-            img=cv2.resize(img,(int(img.shape[1]*scale),int(img.shape[0]*scale)))
+    if os.path.split(img_path)[1].split('.')[-1] in ['mat']:  # 图片存在mat文件中
+        img = sio.loadmat(img_path)['img1_scb']
+        if scale != 1:
+            img = cv2.resize(img,(int(img.shape[1]*scale),int(img.shape[0]*scale)))  # 放缩
 
-    elif os.path.split(img_path)[1].split('.')[-1] in ['tiff','tif']:
+    elif os.path.split(img_path)[1].split('.')[-1] in ['tiff','tif']:  # tiff图片
         with rasterio.open(img_path) as dataset:
             if scale != 1:
+                # 在读取 TIFF 文件时直接缩放图像，无需额外的 cv2.resize 操作
                 img = dataset.read(out_shape=(dataset.count, int(dataset.height * scale),
                                                   int(dataset.width * scale)), resampling=Resampling.bilinear)
+                # dataset.count 是图像的通道数。
             else:
                 img=dataset.read()
+            # 如果图像只有一个通道（如灰度图像或热成像图像），rasterio.read() 方法返回的数组会有一个额外的维度，
+            # 通过 img[0] 可以去掉第一个维度，使 img 变成 (height, width) 的二维数组
             img=img[0]
-    else:
+    else:  # 普通图片
         # if end with '.png' or '.jpg'
         img=cv2.imread(img_path)
         if scale!=1:
@@ -77,20 +85,23 @@ def img_read(img_path,scale):
 
 
 def center_crop(img,crop_size=1000):
-    if len(img.shape)==3:
-        if img.shape[0]==1:
+    """
+    从img中间裁出crop_size*crop_size的正方形图片
+    """
+    if len(img.shape)==3:  # 三维图片
+        if img.shape[0]==1:  # 实际是二维图片
             c,m,n=img.shape
         else:
             m, n,c = img.shape
-    else:
+    else:  # 二维图片
         m,n=img.shape
-    s_m = (m - crop_size) / 2
+    s_m = (m - crop_size) / 2  # 裁剪时，被裁掉的边缘宽度
     s_n = (n - crop_size) / 2
     B = [int(s_m), int(s_n), crop_size, crop_size]
     if img.shape[0]==1:
-        img = img[0,B[0]:B[0] + B[2], B[1]:B[1] + B[3]]
+        img = img[0,B[0]:B[0] + B[2], B[1]:B[1] + B[3]]  # 从中间裁出crop_size*crop_size的正方形图片
     else:
-        img = img[B[0]:B[0] + B[2], B[1]:B[1] + B[3]]
+        img = img[B[0]:B[0] + B[2], B[1]:B[1] + B[3]]  # 从中间裁出crop_size*crop_size的正方形图片
     return img
 
 def homo_save(csv_path,H):

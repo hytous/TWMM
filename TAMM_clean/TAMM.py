@@ -388,7 +388,8 @@ class TAMM(object):
 
 def TAMM_registration(thermal_visible_c, cfg):
     # 提取CFOG特征
-    thermal_visible_c.get_img_features(method=cfg['fea'],bin_size=cfg['bin_size'])
+    # 只对tiff的热成像图和灰度的可见光图做了特征提取
+    thermal_visible_c.get_img_features(method=cfg['fea'],bin_size=cfg['bin_size'])  # CFOG, 9
     # CFOG TAMM配准
     corres = thermal_visible_c.get_correspoints(method='TAMM',
                                                 patch_size=cfg['patch_size'],

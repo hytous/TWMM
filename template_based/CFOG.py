@@ -83,7 +83,7 @@ class CFOG_descriptor():
     def __init__(self, img,  bin_size):
         self.img = img
         self.bin_size = bin_size
-        self.angle_unit = 2*np.pi / self.bin_size
+        self.angle_unit = 2*np.pi / self.bin_size  # 0~360度，bin_size（9）个方向的偏导
 
     def global_gradient(self):
         #得到每个像素的梯度

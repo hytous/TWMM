@@ -38,11 +38,11 @@ def point_generate(imgsize,num_point):
 
 def one_img_process(thermal_tiff_path,visible_rgb_path,thermal_rgb_path,method,save_root,cfg=None):
     # homo_save_path, error_save_path, point_save_path = save_root
-    #先缩放和裁剪，得到thermal和visible
+    #先缩放和裁剪，得到thermal和visible的图像（visible变成灰度图，保留了亮度信息。tiff图片也是灰度图）
     thermal_visible_c = ThermalVisble(thermal_tiff_path=thermal_tiff_path,
                                       thermal_rgb_path=thermal_rgb_path,
                                       visible_rgb_path=visible_rgb_path,
-                                      scale={'thermal':2*1.15,'visible':1},
+                                      scale={'thermal':2*1.15,'visible':1},  # 这里改成自己图片的比例
                                       crop_size=1000,
                                       attention_flag=False)
 
@@ -62,10 +62,10 @@ def one_img_process(thermal_tiff_path,visible_rgb_path,thermal_rgb_path,method,s
         homo,correspoint=dict_method[method](thermal_visible_c.thermal_tiff,thermal_visible_c.visible_rgb_gray)
     elif method in ['hardnet','tfeat']:
         homo, correspoint = dict_method[method](thermal_visible_c.thermal_rgb, thermal_visible_c.visible_rgb)
-    elif method in ['cfog','tamm']:
+    elif method in ['cfog','tamm']:  # tamm是此论文的算法
         homo, correspoint = dict_method[method](thermal_visible_c,cfg)
 
-    if   homo is None:
+    if homo is None:
         homo=np.array([[1, 0, 0],
                       [0, 1, 0],
                       [0, 0, 1]], dtype=np.float64)
@@ -96,8 +96,8 @@ def one_img_process(thermal_tiff_path,visible_rgb_path,thermal_rgb_path,method,s
 
 
 def cfg_forcfog_tamm(method):
-    patch_size = 40 if method=='tamm' else 100
-
+    patch_size = 40 if method=='tamm' else 100  # 论文里提到的atomic patch size
+    # bin_size大概是9个方向偏导， search_radius论文里是60， num_points不知道是啥， thresh也不知道， level_max指的是金字塔共4层，
     return {'bin_size':9,'patch_size':patch_size,'search_radius':50,'num_points':625,'thresh':2,'level_max':4,'fea':'CFOG'}
 
 

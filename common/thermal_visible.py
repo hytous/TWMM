@@ -57,23 +57,26 @@ class ThermalVisble(object):
                  thermal_rgb_path,
                  visible_rgb_path,
                  scale,
-                 crop_size,
+                 crop_size,  # 1000
                  attention_flag=False
                  ):
-        thermal_tiff=img_read(thermal_tiff_path,scale['thermal']) if scale is not None else img_read(thermal_tiff_path,2.3)
-        thermal_rgb=img_read(thermal_rgb_path,scale['thermal']) if scale is not None else img_read(thermal_tiff_path,2.3)
+        thermal_tiff=img_read(thermal_tiff_path,scale['thermal']) if scale is not None else img_read(thermal_tiff_path,2.3)  # 2.3要改
+        thermal_rgb=img_read(thermal_rgb_path,scale['thermal']) if scale is not None else img_read(thermal_tiff_path,2.3)  # 2.3要改
         visible_rgb=img_read(visible_rgb_path,1)
 
         self.img_name = os.path.split(thermal_tiff_path)[1].split('.')[0]
-        self.thermal_tiff=center_crop(thermal_tiff,crop_size)
-        self.thermal_rgb=center_crop(thermal_rgb,crop_size)
-        self.visible_rgb=center_crop(visible_rgb,crop_size)
+        self.thermal_tiff=center_crop(thermal_tiff,crop_size)  # 从中间裁出crop_size*crop_size的正方形图片
+        self.thermal_rgb=center_crop(thermal_rgb,crop_size)  # 从中间裁出crop_size*crop_size的正方形图片
+        self.visible_rgb=center_crop(visible_rgb,crop_size)  # 从中间裁出crop_size*crop_size的正方形图片
+
+        # 将可见光图像从 BGR 格式转换为灰度（Gray）格式。转换后，图像变成单通道，每个像素的值表示亮度，范围通常在 0（黑色）到 255（白色）之间。
+        # 转换后灰度图像减少了色彩信息，但保留了亮度信息，适用于检测边缘、特征提取等任务。
         self.visible_rgb_gray=cv2.cvtColor(self.visible_rgb,cv2.COLOR_BGR2GRAY)
         self.attention_thermal=None
 
     def get_img_features(self,**kwargs):
         method = kwargs['method']
-        if method=='CFOG':
+        if method=='CFOG':  # 只对tiff的热成像图和灰度的可见光图做了特征提取
             cfog_thermal_tiff = CFOG_descriptor(img=self.thermal_tiff.copy(),bin_size=kwargs['bin_size'])
             self.thermal_fea,self.fea_mag, self.thermal_fea_img,self.thermal_fea_img_norm = cfog_thermal_tiff.extract()
             cfog_visible = CFOG_descriptor(img=self.visible_rgb_gray.copy(),bin_size=kwargs['bin_size'])

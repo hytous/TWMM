@@ -60,8 +60,8 @@ class ThermalVisble(object):
                  crop_size,  # 1000
                  attention_flag=False
                  ):
-        thermal_tiff=img_read(thermal_tiff_path,scale['thermal']) if scale is not None else img_read(thermal_tiff_path,2.3)  # 2.3要改
-        thermal_rgb=img_read(thermal_rgb_path,scale['thermal']) if scale is not None else img_read(thermal_tiff_path,2.3)  # 2.3要改
+        thermal_tiff=img_read(thermal_tiff_path,scale['thermal']) if scale is not None else img_read(thermal_tiff_path,2.8)  # 2.3要改
+        thermal_rgb=img_read(thermal_rgb_path,scale['thermal']) if scale is not None else img_read(thermal_tiff_path,2.8)  # 2.3要改
         visible_rgb=img_read(visible_rgb_path,1)
 
         self.img_name = os.path.split(thermal_tiff_path)[1].split('.')[0]

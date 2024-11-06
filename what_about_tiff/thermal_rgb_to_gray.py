@@ -2,12 +2,16 @@ import cv2
 import rasterio
 import os
 
-tiff_path = r'../test_img/11-44-43-767-radiometric.tiff'
+# tiff_path = r'../test_img/11-44-43-767-radiometric.tiff'
 jpg_path = r'../test_img/11-44-43-767-radiometric.jpg'
 save_path = r'../what_about_tiff/out_pic'
 
+jpg_path = r'D:\S\study\postg_1\Mygo\registration\ir_visi_img\haiNingZhengTai70Mi\thermal\DJI_20240513100611_0001_T.JPG'
+# save_path = r'D:\S\study\postg_1\Mygo\registration\ir_visi_img\haiNingZhengTai70Mi\tiff'
+
 # 确保保存目录存在
 os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
 
 # 读取 JPG 图像
 img = cv2.imread(jpg_path)

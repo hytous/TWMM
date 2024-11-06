@@ -9,7 +9,7 @@ from common.thermal_visible import ThermalVisble
 from feature_based.SIFT_SURF_ORB_RIFT_SCB_HOPC import sift_registration,surf_registration,orb_registration,rift_registration,scb_registration,hardnet_registration,tfeat_registration
 from template_based.CFOG import CFOG_registration
 from TAMM_clean.TAMM import TAMM_registration
-
+from my_image import get_my_image_path
 def vis_correspoint(homo,point_dict,threhold,imgpath):
     #遍历每个点，计算其误差
     CP_list=[]
@@ -42,7 +42,7 @@ def one_img_process(thermal_tiff_path,visible_rgb_path,thermal_rgb_path,method,s
     thermal_visible_c = ThermalVisble(thermal_tiff_path=thermal_tiff_path,
                                       thermal_rgb_path=thermal_rgb_path,
                                       visible_rgb_path=visible_rgb_path,
-                                      scale={'thermal':2*1.15,'visible':1},  # 这里改成自己图片的比例
+                                      scale={'thermal':2.8,'visible':1},  # 这里改成自己图片的比例
                                       crop_size=1000,
                                       attention_flag=False)
 
@@ -101,21 +101,27 @@ def cfg_forcfog_tamm(method):
     return {'bin_size':9,'patch_size':patch_size,'search_radius':50,'num_points':625,'thresh':2,'level_max':4,'fea':'CFOG'}
 
 
-if __name__=='__main__':
+# 自己的图像比例是1:2.8
+if __name__=='__main__':  # cv2.imread读不了中文路径,不要出现中文路径
     #输入图像(原始图像)，输入方法，结果保存地址，得到结果(homo和可视化结果保存，缩放裁剪后的图像，配准后的图像)
     method_list=['tamm']#['tfeat','hardnet','orb','sift','surf','rift','scb']
 
-    img_name_list = ['12-09-57-454']#'21-11-28-547'#'21-11-32-580',21-11-28-547,21-10-58-550,21-11-14-582,21-11-16-552,21-11-18-549,21-11-20-556,
+    # img_name_list = ['12-09-57-454']#'21-11-28-547'#'21-11-32-580',21-11-28-547,21-10-58-550,21-11-14-582,21-11-16-552,21-11-18-549,21-11-20-556,
+    img_name_list = ['my']#'21-11-28-547'#'21-11-32-580',21-11-28-547,21-10-58-550,21-11-14-582,21-11-16-552,21-11-18-549,21-11-20-556,
     for img_name in img_name_list:
-        thermal_path = f'test_img/{img_name}-radiometric.tiff'
-        # thermal_path 通常表示一个指向 热图像文件（thermal image file）的路径。
-        # TIFF（Tagged Image File Format）是一种灵活、适应性强的图像文件格式，广泛用于存储高质量的图像数据
-        thermal_rgb_path = f'test_img/{img_name}-radiometric.jpg'
-        visible_path = f'test_img/{img_name}-visible.jpg'
+        if img_name == 'my':
+            # cv2.imread读不了中文路径,不要出现中文路径
+            visible_path, thermal_rgb_path, thermal_path = get_my_image_path()  # 自己写的
+        else:
+            thermal_path = f'test_img/{img_name}-radiometric.tiff'
+            # thermal_path 通常表示一个指向 热图像文件（thermal image file）的路径。
+            # TIFF（Tagged Image File Format）是一种灵活、适应性强的图像文件格式，广泛用于存储高质量的图像数据
+            thermal_rgb_path = f'test_img/{img_name}-radiometric.jpg'
+            visible_path = f'test_img/{img_name}-visible.jpg'
 
 
         for method in method_list:
-            output_path = f'test_img/out/{method}/{img_name}'
+            output_path = f'test_img/my/out/{method}/{img_name}'  # 改成自己的路径了
             one_img_process(thermal_path,  visible_path,thermal_rgb_path,
                             method=method,
                             save_root = output_path,
